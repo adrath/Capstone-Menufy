@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="jumbotron rounded-0">
+    <div class="container text-center">
+        <div id="jumbo-text">
+            <h1 class="display-4">Menufy</h1>
+            <p class="lead">Welcome to {{restaurant_name}}</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <form id="order_form{{restaurant_id}}" method="POST" action="/order/{{restaurant_id}}">
+        
+            {% for category, list in new_menu.items() %}
+            <div class="card-columns" >
+                <div class="card" style="border-width:5px; border-color: grey;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{category}}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="card-columns" >
+                {% for item in list %}
+                    <div class="card"  style="border-width:5px; border-color: grey;">
+                        <div class="card-body" >
+                            <input type="hidden" id={{item.menu_item_id}} name="menu_item_id" value={{item.menu_item_id}}>
+                            <h5 class="card-title" name={{item.item_name}} value={{item.item_name}}>{{item.item_name}}</h5>
+                            <p class="card-text">{{item.item_description}}</p>
+                            <p class="card-text">Price: $ {{item.item_unit_price}}</p>
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" id="sub" class="sub">-</button>
+                            <input id={{item.menu_item_id}} type="text" name="quantity" value="0">
+                            <button type="button" id="add" class="add">+</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <div class="form-group">
+                <button type="submit" class="btn btn-warning">Review Order</button>
+            </div>
+        </form>
+    </div>
+
+    <script type="text/javascript">    
+
+        $('.add').click(function () {
+            $(this).prev().val(+$(this).prev().val() + 1);
+        });
+        $('.sub').click(function () {
+            if ($(this).next().val() > 0) $(this).next().val(+$(this).next().val() - 1);
+        });
+    </script>
+    
+</div>
+
+
+{% endblock %}

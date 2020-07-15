@@ -1,0 +1,84 @@
+{% extends "base.html" %} {% block content %}
+<div class="jumbotron rounded-0">
+    <div class="container text-center">
+        <div id="jumbo-text">
+            <h1 class="display-4">Menufy</h1>
+            <p class="lead">{{restaurant_name}} Inventory Levels</p>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-7 container backdrop">
+    <form id="order_form{{restaurant_id}}" method="POST" action="/order/{{restaurant_id}}">
+        <table class="table table-hover table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">Item Name</th>
+                    <th scope="col">Item Cost</th>
+                    <th scope="col">Quantity In Stock</th>
+                </tr>
+            </thead>
+            <tbody id="menu">
+            </tbody>
+        </table>
+    </form>
+
+    <script type="text/javascript">
+        var menu_data = JSON.parse('{{ menu_data |  safe }}');
+
+        var transform = {
+            "<>": "tr",
+            'id': '${menu_item_id}',
+            "children": [{
+                "<>": "input",
+                "type": "hidden",
+                'id': '${menu_item_id}',
+                "name": "menu_item_id",
+                "value": '${menu_item_id}'
+            }, {
+                "<>": "td",
+                'name': 'item_name',
+                "html": "${item_name}",
+                "value": "item_name"
+            }, {
+                "<>": "td",
+                "html": "$ ${item_unit_price}"
+            }, {
+                "<>": "td",
+                "html": "${item_quantity_available}"
+            }, {
+                "<>": "td",
+                "children": [{
+                    '<>': 'button',
+                    'type': 'button',
+                    'id': '${menu_item_id}',
+                    'name': 'reorder',
+                    'class': 'reorder btn btn-primary',
+                    'html': 'Reorder'
+                }]
+            }]
+        };
+
+        $('#menu').html(json2html.transform(menu_data, transform));
+
+        $('button[name ="reorder"]').click(function() {
+            var menu_item_id = $(this).attr('id');
+            $.ajax({
+                type: "POST",
+                url: '/business/reorder/' + menu_item_id,
+                // data: $('#menu_edit_form').serialize(),
+                success: function(response) {
+                    location.reload();
+                }
+            });
+            return false;
+            // var menu_item_id = $(this).attr('id');
+            // var menu_item_data = $(this).attr('value');
+            // var arr = menu_item_data.split(',');
+            // $(".modal-title").html("Edit Menu Item");
+            // var response = getMenuItem(menu_item_id);
+            // document.getElementById('menu_edit_form').setAttribute("name", menu_item_id);
+        });
+    </script>
+</div>
+{% endblock %}
